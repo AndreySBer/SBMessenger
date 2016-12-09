@@ -8,6 +8,7 @@
 #include "messenger\observers.h"
 #include "messenger\settings.h"
 #include "messenger\types.h"
+#include "NativeLinker.h"
 
 using namespace messenger;
 
@@ -26,10 +27,15 @@ private:
 };
 
 typedef void(*StatusChanged)(char* MessageId, message_status::Type);
-typedef void(*MessageReceived)(char* UserId, char* Message);
+//todo add time into method
+typedef void(*MessageReceived)(char* UserId,
+	char* MessageId,
+	/*MessageContent*/
+	message_content_type::Type type,
+	bool encrypted,
+	unsigned char* Data, int len);
 
-/*typedef void(*StatusChanged)(const MessageId&, message_status::Type);
-typedef void(*MessageReceived)(const UserId&, const Message&);*/
+unsigned char * vecToArray(std::vector<unsigned char> vec);
 
 class MessagesObserver :public messenger::IMessagesObserver {
 public:
@@ -43,30 +49,66 @@ private:
 		statusChanged = NULL;
 	}
 	void OnMessageReceived(const UserId& senderId, const Message& msg)override {
-		if (messageReceived != NULL && msg.content.type==message_content_type::Text) messageReceived((char*)(senderId.c_str()), (char*) (&msg));
+		if (messageReceived != NULL && msg.content.type == message_content_type::Text) {
+			messageReceived((char*)(senderId.c_str()),
+				(char*)(msg.identifier.c_str()),
+				msg.content.type,
+				msg.content.encrypted,
+				vecToArray(msg.content.data),
+				msg.content.data.size());
+		}
 		messageReceived = NULL;
 	}
 };
+struct UserFull
+{
+	char* userID;
+	encryption_algorithm::Type encryptionAlgo;
+	unsigned char* SecPublicKey;
+	int KeyLength;
+};
 
-/*typedef void(*ListCallback)(int* list, int length);
-typedef void(*UsersResultCallback)(messenger::operation_result::Type, const UserList&);
+typedef void(*UsersResultCallback)(messenger::operation_result::Type result, UserFull* userArr, int length);
 class CallbackRequestUser : public messenger::IRequestUsersCallback
 {
 public:
 	UsersResultCallback callback = NULL;
 private:
 	void OnOperationResult(operation_result::Type result, const UserList& users) override {
-		if (callback != NULL) callback(result,users);
+		UserFull* usersArr = new UserFull[users.size()];
+		for (int i = 0; i < users.size(); i++) {
+			usersArr[i].userID = (char*)(users[i].identifier).c_str();
+			usersArr[i].encryptionAlgo = users[i].securityPolicy.encryptionAlgo;
+			usersArr[i].SecPublicKey = vecToArray(users[i].securityPolicy.encryptionPubKey);
+			usersArr[i].KeyLength = users[i].securityPolicy.encryptionPubKey.size();
+		}
+		if (callback != NULL) callback(result, usersArr, users.size());
 		callback = NULL;
-
 	}
-};*/
+};
 
 
 static std::shared_ptr<messenger::IMessenger> g_messenger;
 static CallbackProxy g_callbackProxy;
 static MessagesObserver g_messagesObserver;
-/*static CallbackRequestUser g_callbackReqUser;*/
+static CallbackRequestUser g_callbackReqUser;
+
+
+std::vector<unsigned char> arrToVector(unsigned char* arr, int size) {
+	std::vector<unsigned char> res = std::vector<unsigned char>(size);
+	for (int i = 0; i < size; i++) {
+		res[i] = arr[i];
+	}
+	return res;
+}
+
+unsigned char* vecToArray(std::vector<unsigned char> vec) {
+	unsigned char* res = new unsigned char[vec.size()];
+	for (int i = 0; i < vec.size(); i++) {
+		res[i] = vec[i];
+	}
+	return res;
+}
 
 extern "C" {
 	void __declspec(dllexport) Init(char* url, unsigned short port) {
@@ -89,24 +131,38 @@ extern "C" {
 		g_messenger->Login(loginStr, passwordStr, messenger::SecurityPolicy(), &g_callbackProxy);
 	}
 
-	/*void __declspec(dllexport) RequestActiveUsers(UsersResultCallback reqUserCallback) {
+	void __declspec(dllexport) RequestActiveUsers(UsersResultCallback reqUserCallback) {
 		g_callbackReqUser.callback = reqUserCallback;
 		g_messenger->RequestActiveUsers(&g_callbackReqUser);
-	}*/
+	}
 
-	/*Message _declspec(dllexport) SendMessage(char* recepientId, MessageContent* msgData) {
-		return SendMessage(recepientId, msgData);
-	}*/
+	
 	void _declspec(dllexport) SendMessage(char* recepientId, char* msg, int msg_len) {
 		std::vector<unsigned char>data(msg, msg + msg_len);
-		Data datad =(Data) data;
+		Data datad = (Data)data;
 		MessageContent msgData = MessageContent();
+		msgData.type = message_content_type::Text;
 		msgData.data = datad;
 		g_messenger->SendMessage(recepientId, msgData);
 	}
-	void _declspec(dllexport) SendMessageSeen(char* userId, char* msgId) {
-		g_messenger->SendMessageSeen(userId,msgId);
+
+	void _declspec(dllexport) SendComplexMessage(char* recepientId,
+		/*MessageContent*/
+		message_content_type::Type type,
+		bool encrypted,
+		unsigned char* msg,
+		int msg_len) {
+		MessageContent msgC;
+		msgC.type = type;
+		msgC.encrypted = encrypted;
+		msgC.data = arrToVector(msg, msg_len);
+		g_messenger->SendMessage(recepientId, msgC);
 	}
+
+	void _declspec(dllexport) SendMessageSeen(char* userId, char* msgId) {
+		g_messenger->SendMessageSeen(userId, msgId);
+	}
+
 
 
 	void __declspec(dllexport) RegisterObserver(StatusChanged statusChanged, MessageReceived messageReceived) {

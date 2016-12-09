@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -22,9 +23,26 @@ namespace SBMessenger
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
+                    string mes = Encoding.UTF8.GetString(MessengerInterop.res.Message);
+                    mes = mes.Remove(mes.Length - 1);
+                    SuccessToaster.Toast(message: mes + " " + receiver_id, animation: netoaster.ToasterAnimation.FadeIn);
+                    //throw new ApplicationException(mes);
                 });
             };
-            MessengerInterop.res.StatusChangedEvent += delegate () { };
+            
+            MessengerInterop.MessageResult.MessageResultHandler handler1 = delegate ()
+            {
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                (ThreadStart)delegate ()
+                {
+                    string mes = "Message is " + Enum.GetName(typeof(MessageStatus), MessengerInterop.res.Status);
+                    ErrorToaster.Toast(message: mes, animation: netoaster.ToasterAnimation.FadeIn);
+                    
+                });
+
+
+            };
+            MessengerInterop.res.StatusChangedEvent += handler1;
             MessengerInterop.res.MessageReceivedEvent += handler;
         }
 
@@ -48,6 +66,7 @@ namespace SBMessenger
                 case OperationResult.NetworkError: ErrorToaster.Toast(message: "NetworkError"); break;
                 case OperationResult.InternalError: ErrorToaster.Toast(message: "InternalError"); break;
             }
+            MessengerInterop.RequestActiveUsers();
         }
         private void button_Click_Disconnect(object sender, RoutedEventArgs e)
         {
@@ -69,8 +88,11 @@ namespace SBMessenger
 
         private void button_Click_ShowActiveUses(object sender, RoutedEventArgs e)
         {
-            string msg = "Hello world.Hello world.Hello world.Hello world.Hello world.Hello world";
-            MessengerInterop.SendMessage(receiver_id, msg, msg.Length);
+            string msg = "Please help me";
+            //MessengerInterop.SendMessage(receiver_id, msg, msg.Length);
+            byte[] mesg = Encoding.UTF8.GetBytes(msg + '\0');
+            //byte[] mesg = {1,2,1,2,1,1,1,(byte)'\0' };
+            MessengerInterop.SendComplexMessage(receiver_id, MessageContentType.Text, false, mesg, mesg.Length);
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
