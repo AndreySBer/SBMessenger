@@ -77,7 +77,9 @@ extern "C" {
 	}
 
 	void __declspec(dllexport) Disconnect() {
+		g_messenger->UnregisterObserver(&g_messagesObserver);
 		g_messenger->Disconnect();
+		g_messenger->~IMessenger();
 	}
 
 	void __declspec(dllexport) Login(char * login, char * password, LoginCallback loginCallback) {
@@ -107,12 +109,7 @@ extern "C" {
 		g_messenger->SendMessageSeen(userId,msgId);
 	}
 
-	/*void __declspec(dllexport) Login(char * login, char * password, LoginCallback loginCallback) {
-		std::string loginStr(login);
-		std::string passwordStr(password);
-		g_callbackProxy.loginCallback = loginCallback;
-		g_messenger->Login(loginStr, passwordStr, messenger::SecurityPolicy(), &g_callbackProxy);
-	}*/
+
 	void __declspec(dllexport) RegisterObserver(StatusChanged statusChanged, MessageReceived messageReceived) {
 		g_messagesObserver.statusChanged = statusChanged;
 		g_messagesObserver.messageReceived = messageReceived;

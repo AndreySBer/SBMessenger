@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 
 namespace SBMessenger
 {
@@ -15,8 +17,21 @@ namespace SBMessenger
         public MainWindow()
         {
             InitializeComponent();
-            MessengerInterop.res.StatusChangedEvent += delegate(){ };
-            MessengerInterop.res.MessageReceivedEvent += delegate () { SuccessToaster.Toast(message: MessengerInterop.res.Message, animation: netoaster.ToasterAnimation.FadeIn); };
+            MessengerInterop.MessageResult.MessageResultHandler handler = delegate ()
+            {
+                this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                (ThreadStart)delegate ()
+                {
+                    SuccessToaster.Toast(message: MessengerInterop.res.Message, animation: netoaster.ToasterAnimation.FadeIn);
+                });
+            };
+            MessengerInterop.res.StatusChangedEvent += delegate () { };
+            MessengerInterop.res.MessageReceivedEvent += handler;
+            /*delegate ()
+        {
+            //throw new ApplicationException(MessengerInterop.res.Message);
+            //SuccessToaster.Toast(message: MessengerInterop.res.Message, animation: netoaster.ToasterAnimation.FadeIn);
+        };*/
         }
 
 
@@ -29,8 +44,9 @@ namespace SBMessenger
         {
             MessengerInterop.Init();
 
-            Task<OperationResult> task = MessengerInterop.Login("User_One@sb","pass");
-            receiver_id = "User_Two@sb";
+            Task<OperationResult> task = MessengerInterop.Login("user_one@sb", "pass");
+            MessengerInterop.RegisterObserver();
+            receiver_id = "user_two@sb";
             switch (task.Result)
             {
                 case OperationResult.Ok: SuccessToaster.Toast(message: "Loged in", animation: netoaster.ToasterAnimation.FadeIn); break;
@@ -42,11 +58,11 @@ namespace SBMessenger
         private void button_Click_Disconnect(object sender, RoutedEventArgs e)
         {
 
-            //MessengerInterop.Disconnect();
+
             MessengerInterop.Init();
 
-            Task<OperationResult> task = MessengerInterop.Login("User_Two@sb", "pass");
-            receiver_id = "User_One@sb";
+            Task<OperationResult> task = MessengerInterop.Login("user_two@sb", "pass");
+            receiver_id = "user_one@sb";
             switch (task.Result)
             {
                 case OperationResult.Ok: SuccessToaster.Toast(message: "Loged in", animation: netoaster.ToasterAnimation.FadeIn); break;
@@ -61,6 +77,11 @@ namespace SBMessenger
         {
             string msg = "Hello world";
             MessengerInterop.SendMessage(receiver_id, msg, msg.Length);
+        }
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            MessengerInterop.Disconnect();
         }
     }
 

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -20,7 +17,7 @@ namespace SBMessenger
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void StatusChanged([MarshalAs(UnmanagedType.LPStr)] string MessageId, MessageStatus status);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl, CharSet = CharSet.Ansi)]
     public delegate void MessageReceived([MarshalAs(UnmanagedType.LPStr)] string UserId, [MarshalAs(UnmanagedType.LPStr)] string Message);
     public enum MessageStatus
     {
@@ -79,7 +76,7 @@ namespace SBMessenger
         [DllImport("NativeLinker.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void Login([MarshalAs(UnmanagedType.LPStr)] string login, [MarshalAs(UnmanagedType.LPStr)] string password, IntPtr loginCallback);
 
-        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("NativeLinker.dll", CharSet = CharSet.Ansi, CallingConvention = CallingConvention.Cdecl)]
         public static extern void RegisterObserver(IntPtr statusChanged, IntPtr messageReceived);
 
         [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -131,15 +128,16 @@ namespace SBMessenger
             return task.Task;
         }
         public static MessageResult res = new MessageResult();
-        public static Task<MessageResult> RegisterObserver()
+        private static StatusChanged StChDeleg;
+        private static MessageReceived MesRecdeleg;
+        public static void RegisterObserver()
         {
-            var task = new TaskCompletionSource<MessageResult>();
             //MessageResult res = new MessageResult();
-            var statusCallback = Marshal.GetFunctionPointerForDelegate(new StatusChanged(res.StatusChanged));
-            var messageCallback= Marshal.GetFunctionPointerForDelegate(new MessageReceived(res.MessageReceived));
+            StChDeleg = new StatusChanged(res.StatusChanged);
+            IntPtr statusCallback = Marshal.GetFunctionPointerForDelegate(StChDeleg);
+            MesRecdeleg = new MessageReceived(res.MessageReceived);
+            IntPtr messageCallback = Marshal.GetFunctionPointerForDelegate(MesRecdeleg);
             MessengerInterop.RegisterObserver(statusCallback, messageCallback);
-            task.SetResult(res);
-            return task.Task;
         }
     }
 }
