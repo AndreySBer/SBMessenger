@@ -22,16 +22,10 @@ namespace SBMessenger
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    SuccessToaster.Toast(message: MessengerInterop.res.Message, animation: netoaster.ToasterAnimation.FadeIn);
                 });
             };
             MessengerInterop.res.StatusChangedEvent += delegate () { };
             MessengerInterop.res.MessageReceivedEvent += handler;
-            /*delegate ()
-        {
-            //throw new ApplicationException(MessengerInterop.res.Message);
-            //SuccessToaster.Toast(message: MessengerInterop.res.Message, animation: netoaster.ToasterAnimation.FadeIn);
-        };*/
         }
 
 
@@ -75,7 +69,7 @@ namespace SBMessenger
 
         private void button_Click_ShowActiveUses(object sender, RoutedEventArgs e)
         {
-            string msg = "Hello world";
+            string msg = "Hello world.Hello world.Hello world.Hello world.Hello world.Hello world";
             MessengerInterop.SendMessage(receiver_id, msg, msg.Length);
         }
 

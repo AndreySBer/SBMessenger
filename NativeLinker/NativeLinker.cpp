@@ -98,9 +98,8 @@ extern "C" {
 		return SendMessage(recepientId, msgData);
 	}*/
 	void _declspec(dllexport) SendMessage(char* recepientId, char* msg, int msg_len) {
-		Data datad;
-		std::vector<char>data(msg, msg + msg_len);
-
+		std::vector<unsigned char>data(msg, msg + msg_len);
+		Data datad =(Data) data;
 		MessageContent msgData = MessageContent();
 		msgData.data = datad;
 		g_messenger->SendMessage(recepientId, msgData);
