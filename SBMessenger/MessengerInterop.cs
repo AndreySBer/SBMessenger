@@ -19,17 +19,9 @@ namespace SBMessenger
             None,
             RSA_1024
     }
-    [StructLayout(LayoutKind.Sequential)]
-    public struct UserFull
-    {
-        [MarshalAs(UnmanagedType.LPStr)] string userID;
-        encryption_algorithm_type encryptionAlgo;
-        [MarshalAs(UnmanagedType.SafeArray)] byte[] SecPublicKey;
-        int KeyLength;
-    };
-
+    
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-    public delegate void UsersResultCallback(OperationResult result, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)][In, Out] UserFull[] users, int length);
+    public delegate void UsersResultCallback([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)][In, Out] string[] users, int length);
 
 
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
@@ -37,10 +29,11 @@ namespace SBMessenger
     [UnmanagedFunctionPointer(CallingConvention.Cdecl )]
     public delegate void MessageReceived([MarshalAs(UnmanagedType.LPStr)] string UserId,
         [MarshalAs(UnmanagedType.LPStr)]string MessageId,
+        long time,
         /*MessageContent*/
         MessageContentType type,
         bool encrypted,
-        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 5)][In,Out] byte[] Message, 
+        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 6)][In,Out] byte[] Message, 
         int mesLen);
     public enum MessageStatus
     {
@@ -61,6 +54,15 @@ namespace SBMessenger
 
     public static class MessengerInterop
     {
+        public static class DateTimeConversion
+        {
+            public static DateTime UnixTimeToDateTime(long unixTime)
+            {
+                return UnixStartTime.AddSeconds(Convert.ToDouble(unixTime));
+            }
+            private static readonly DateTime UnixStartTime = new DateTime(
+            1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        }
         public class MessageResult
         {
             public delegate void MessageResultHandler();
@@ -75,6 +77,7 @@ namespace SBMessenger
             public string ReceivedMessageId { get; private set; }
             public bool ReceivedMessageEncrypted { get; private set; }
             public MessageContentType ReceivedMesType { get; private set; }
+            public DateTime Time { get; private set; }
 
             public void StatusChanged(string MessageId, MessageStatus status)
             {
@@ -82,10 +85,14 @@ namespace SBMessenger
                 this.Status = status;
                 StatusChangedEvent();
             }
-            public void MessageReceived(string UserId, string MessageId,
+            public void MessageReceived(string UserId, 
+                string MessageId,
+                long time,
             /*MessageContent*/
             MessageContentType type,
-            bool encrypted, byte[] Message, int mesLen)
+            bool encrypted, 
+            byte[] Message, 
+            int mesLen)
             {
                 this.UserId = UserId;
                 this.Message = Message;
@@ -93,6 +100,8 @@ namespace SBMessenger
                 ReceivedMessageId = MessageId;
                 ReceivedMessageEncrypted = encrypted;
                 ReceivedMesType = type;
+                Time = DateTimeConversion.UnixTimeToDateTime(time);
+
                 MessageReceivedEvent();
                 SendMessageSeen(UserId, ReceivedMessageId);
             }
@@ -100,7 +109,7 @@ namespace SBMessenger
 
         public class UsersListHandler
         {
-            public void UsersLoaded(OperationResult result, [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 2)][In, Out] UserFull[] users, int length)
+            public void UsersLoaded(string[] users, int length)
             {
 
             }

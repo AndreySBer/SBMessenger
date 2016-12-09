@@ -12,7 +12,7 @@
 
 using namespace messenger;
 
-
+typedef unsigned char * BYTES;
 
 typedef void(*LoginCallback)(messenger::operation_result::Type);
 class CallbackProxy : public messenger::ILoginCallback
@@ -30,6 +30,7 @@ typedef void(*StatusChanged)(char* MessageId, message_status::Type);
 //todo add time into method
 typedef void(*MessageReceived)(char* UserId,
 	char* MessageId,
+	std::time_t time,
 	/*MessageContent*/
 	message_content_type::Type type,
 	bool encrypted,
@@ -52,6 +53,7 @@ private:
 		if (messageReceived != NULL && msg.content.type == message_content_type::Text) {
 			messageReceived((char*)(senderId.c_str()),
 				(char*)(msg.identifier.c_str()),
+				msg.time,
 				msg.content.type,
 				msg.content.encrypted,
 				vecToArray(msg.content.data),
@@ -67,22 +69,29 @@ struct UserFull
 	unsigned char* SecPublicKey;
 	int KeyLength;
 };
-
-typedef void(*UsersResultCallback)(messenger::operation_result::Type result, UserFull* userArr, int length);
+UserFull* usersArr;
+int usersCount;
+typedef void(*UsersResultCallback)(char** users, int length);
 class CallbackRequestUser : public messenger::IRequestUsersCallback
 {
 public:
 	UsersResultCallback callback = NULL;
 private:
 	void OnOperationResult(operation_result::Type result, const UserList& users) override {
-		UserFull* usersArr = new UserFull[users.size()];
+		if (usersArr) {
+			delete[] usersArr;
+		}
+		usersCount = users.size();
+		usersArr = new UserFull[users.size()];
+		char** res = new char*[users.size()];
 		for (int i = 0; i < users.size(); i++) {
+			res[i] = (char*)(users[i].identifier).c_str();
 			usersArr[i].userID = (char*)(users[i].identifier).c_str();
 			usersArr[i].encryptionAlgo = users[i].securityPolicy.encryptionAlgo;
 			usersArr[i].SecPublicKey = vecToArray(users[i].securityPolicy.encryptionPubKey);
 			usersArr[i].KeyLength = users[i].securityPolicy.encryptionPubKey.size();
 		}
-		if (callback != NULL) callback(result, usersArr, users.size());
+		if (callback != NULL) callback(res, users.size());
 		callback = NULL;
 	}
 };
@@ -136,7 +145,7 @@ extern "C" {
 		g_messenger->RequestActiveUsers(&g_callbackReqUser);
 	}
 
-	
+
 	void _declspec(dllexport) SendMessage(char* recepientId, char* msg, int msg_len) {
 		std::vector<unsigned char>data(msg, msg + msg_len);
 		Data datad = (Data)data;
@@ -163,11 +172,28 @@ extern "C" {
 		g_messenger->SendMessageSeen(userId, msgId);
 	}
 
-
-
 	void __declspec(dllexport) RegisterObserver(StatusChanged statusChanged, MessageReceived messageReceived) {
 		g_messagesObserver.statusChanged = statusChanged;
 		g_messagesObserver.messageReceived = messageReceived;
 		g_messenger->RegisterObserver(&g_messagesObserver);
+	}
+
+	encryption_algorithm::Type __declspec(dllexport) GetUserEncryption(char* userId) {
+		for (int i = 0; i < usersCount; i++) {
+			if (usersArr[i].userID = userId) {
+				return usersArr[i].encryptionAlgo;
+			}
+		}
+		return encryption_algorithm::Type::None;
+	}
+	
+
+	BYTES __declspec(dllexport) GetPublicKey(char * userId) {
+		for (int i = 0; i < usersCount; i++) {
+			if (usersArr[i].userID = userId) {
+				return usersArr[i].SecPublicKey;
+			}
+		}
+		return 0;
 	}
 }

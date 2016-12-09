@@ -26,7 +26,6 @@ namespace SBMessenger
                     string mes = Encoding.UTF8.GetString(MessengerInterop.res.Message);
                     mes = mes.Remove(mes.Length - 1);
                     SuccessToaster.Toast(message: mes + " " + receiver_id, animation: netoaster.ToasterAnimation.FadeIn);
-                    //throw new ApplicationException(mes);
                 });
             };
             
@@ -89,9 +88,7 @@ namespace SBMessenger
         private void button_Click_ShowActiveUses(object sender, RoutedEventArgs e)
         {
             string msg = "Please help me";
-            //MessengerInterop.SendMessage(receiver_id, msg, msg.Length);
             byte[] mesg = Encoding.UTF8.GetBytes(msg + '\0');
-            //byte[] mesg = {1,2,1,2,1,1,1,(byte)'\0' };
             MessengerInterop.SendComplexMessage(receiver_id, MessageContentType.Text, false, mesg, mesg.Length);
         }
 
