@@ -50,7 +50,7 @@ private:
 		statusChanged = NULL;
 	}
 	void OnMessageReceived(const UserId& senderId, const Message& msg)override {
-		if (messageReceived != NULL && msg.content.type == message_content_type::Text) {
+		if (messageReceived != NULL) {
 			messageReceived((char*)(senderId.c_str()),
 				(char*)(msg.identifier.c_str()),
 				msg.time,
