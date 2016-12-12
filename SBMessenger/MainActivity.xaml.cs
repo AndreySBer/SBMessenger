@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -26,7 +27,7 @@ namespace SBMessenger
             InitializeComponent();
             this.DataContext = MessengerInterop.Users;
             this.Show();
-            showDialog();
+           
 
             MessengerInterop.MessageResultHandler messageReceivedHandler = delegate ()
             {
@@ -61,6 +62,7 @@ namespace SBMessenger
             MessengerInterop.mRres.MessageReceivedEvent += messageReceivedHandler;
             MessengerInterop.stCres.StatusChangedEvent += changedStatusHandler;
             MessengerInterop.urh.UsersChangedEvent += usersRequestHandler;
+            showDialog();
 
         }
         void showDialog()
@@ -70,7 +72,17 @@ namespace SBMessenger
             aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             aboutWindow.ShowDialog();
         }
+        string CurrentUser = MessengerInterop.Users[0].UserID;
 
-        
+        private void UsersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            CurrentUser= (string)e.AddedItems[0];
+            UserName.Content = CurrentUser;
+        }
+
+        private void SendMessageButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

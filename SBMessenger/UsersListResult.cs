@@ -17,7 +17,7 @@ namespace SBMessenger
                 {
                     Users.Add(new SBMessenger.User(i));
                 }
-                UsersChangedEvent();
+                UsersChangedEvent?.Invoke();
             }
         }
         public static List<User> Users
