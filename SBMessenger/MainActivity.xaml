@@ -30,8 +30,21 @@
                       SelectionMode="Single" SelectionChanged="UsersList_SelectionChanged"/>
 
             <Label x:Name="UserName" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"/>
-            <ListView x:Name="MessagesLV" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"/>
-            <TextBlock x:Name="MessageText" Grid.Column="1" Grid.Row="2"/>
+            <ListView x:Name="MessagesLV" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding UserName}" FontWeight="Bold" />
+                                <TextBlock Text="{Binding Time}"  />
+                            </StackPanel>
+                            <TextBlock Text="{Binding Text}"  />
+                        </StackPanel>
+                        
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <TextBox x:Name="MessageText" Grid.Column="1" Grid.Row="2" SpellCheck.IsEnabled="True" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow"/>
             <Button x:Name="SendMessageButton" Content="Send" Padding="10" Grid.Column="2" Grid.Row="2" Click="SendMessageButton_Click"/>
         </Grid>
     </DockPanel>

@@ -57,6 +57,7 @@ namespace SBMessenger
                 (ThreadStart)delegate ()
                 {
                     UsersList.ItemsSource = MessengerInterop.Users.Select<User, String>(u => u.UserID);
+                    CurrentUser = MessengerInterop.Users[0].UserID;
                 });
             };
             MessengerInterop.mRres.MessageReceivedEvent += messageReceivedHandler;
@@ -64,6 +65,11 @@ namespace SBMessenger
             MessengerInterop.urh.UsersChangedEvent += usersRequestHandler;
             showDialog();
 
+            List<Messenge> items = new List<Messenge>();
+            items.Add(new Messenge() { UserName = "John Doe", Text = "john@doe-family.com", Time="Today" });
+            items.Add(new Messenge() { UserName = "Jane Doe", Text = "jane@doe-family.com", Time = "Today" });
+            items.Add(new Messenge() { UserName = "Sammy Doe", Text = "sammy.doe@gmail.com", Time = "Today" });
+            MessagesLV.ItemsSource = items;
         }
         void showDialog()
         {
@@ -72,7 +78,7 @@ namespace SBMessenger
             aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
             aboutWindow.ShowDialog();
         }
-        string CurrentUser = MessengerInterop.Users[0].UserID;
+        string CurrentUser = "";
 
         private void UsersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -82,7 +88,24 @@ namespace SBMessenger
 
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)
         {
+            string msg = MessageText.Text;
+            if (msg.Length > 0)
+            {
+                byte[] mesg = Encoding.UTF8.GetBytes(msg + '\0');
+                MessengerInterop.SendComplexMessage(CurrentUser, MessageContentType.Text, false, mesg, mesg.Length);
+            }
+            else
+            {
+                ErrorToaster.Toast(message: "Нельзя отправлять пустые сообщения", animation: netoaster.ToasterAnimation.FadeIn);
+            }
+        }
 
+        public class Messenge
+        {
+            public string UserName { get; set; }
+            public string Time { get; set; }
+            public string Text { get; set; }
+            
         }
     }
 }
