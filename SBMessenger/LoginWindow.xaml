@@ -5,16 +5,43 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SBMessenger"
         mc:Ignorable="d"
-        Title="Welcome" Height="300" Width="300">
+        Title="Welcome" Height="300" Width="300"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        Background="#006d55"
+        >
+
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="Common">
+            <Setter Property="Control.Margin" Value="16,0"/>
+            <Setter Property="Control.Foreground" Value="White"/>
+        </Style>
+        <Style x:Key="Button" TargetType="Button">
+            <Setter Property="Control.Margin" Value="16,4"/>
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Control.Foreground" Value="Black"/>
+        </Style>
+        <Style x:Key="TextBox" TargetType="TextBox">
+            <Setter Property="Control.Margin" Value="16,0"/>
+            <Setter Property="Control.Foreground" Value="Black"/>
+        </Style>
     </Window.Resources>
-    <StackPanel Orientation="Vertical">
-        <Label HorizontalAlignment="Center">Safeboard Messenger 1.0</Label>
-        <Label HorizontalAlignment="Center">Введите логин и пароль для входа</Label>
-        <TextBox></TextBox>
-        <TextBox></TextBox>
-        <CheckBox x:Name="ntwSetVisCb" Content="Показать больше"/>
-        <Button Visibility="{Binding Path=IsChecked, ElementName=ntwSetVisCb, Converter={StaticResource BooleanToVisibilityConverter}}">Порты</Button>
+    <StackPanel Orientation="Vertical" >
+        <Label HorizontalAlignment="Center" Style ="{StaticResource Common}" Margin="16,4" Content="Safeboard Messenger 1.0"/>
+        <Label HorizontalAlignment="Center" Style ="{StaticResource Common}" Content="Введите логин и пароль для входа"/>
+        <Label Style ="{StaticResource Common}" Content="Логин"/>
+        <TextBox x:Name="login" Style ="{StaticResource TextBox}"/>
+        <Label Style ="{StaticResource Common}" Content="Пароль"/>
+        <TextBox x:Name="password" Style ="{StaticResource TextBox}"/>
+        <CheckBox x:Name="ntwSetVisCb" Style ="{StaticResource Common}" Margin="16,4" Content="Показать больше"/>
+        <StackPanel Orientation="Vertical"  Visibility="{Binding Path=IsChecked, ElementName=ntwSetVisCb, Converter={StaticResource BooleanToVisibilityConverter}}" >
+            <Label Style ="{StaticResource Common}" Content="URL"/>
+            <TextBox x:Name="url" Style ="{StaticResource TextBox}" Text="127.0.0.1"/>
+            <Label Style ="{StaticResource Common}" Content="Порт"/>
+            <TextBox x:Name="port" Style ="{StaticResource TextBox}" Text="5222"/>
+        </StackPanel>
+        <Button Style ="{StaticResource Button}" Content="Войти" Click="Login"/>
     </StackPanel>
+
 </Window>
