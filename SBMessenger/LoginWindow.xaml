@@ -1,0 +1,20 @@
+﻿<Window x:Class="SBMessenger.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SBMessenger"
+        mc:Ignorable="d"
+        Title="Welcome" Height="300" Width="300">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Window.Resources>
+    <StackPanel Orientation="Vertical">
+        <Label HorizontalAlignment="Center">Safeboard Messenger 1.0</Label>
+        <Label HorizontalAlignment="Center">Введите логин и пароль для входа</Label>
+        <TextBox></TextBox>
+        <TextBox></TextBox>
+        <CheckBox x:Name="ntwSetVisCb" Content="Показать больше"/>
+        <Button Visibility="{Binding Path=IsChecked, ElementName=ntwSetVisCb, Converter={StaticResource BooleanToVisibilityConverter}}">Порты</Button>
+    </StackPanel>
+</Window>
