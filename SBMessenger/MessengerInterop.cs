@@ -4,126 +4,40 @@ using System.Threading.Tasks;
 
 namespace SBMessenger
 {
+    //Delegates-callbacks
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void LoginCallback(OperationResult result);
-    public enum OperationResult : int
-    {
-        Ok,
-        AuthError,
-        NetworkError,
-        InternalError
-    }
 
-    public enum encryption_algorithm_type
-    {
-            None,
-            RSA_1024
-    }
-    
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void UsersResultCallback([MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 1)][In, Out] string[] users, int length);
 
-
     [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void StatusChanged([MarshalAs(UnmanagedType.LPStr)] string MessageId, MessageStatus status);
-    [UnmanagedFunctionPointer(CallingConvention.Cdecl )]
+
+    [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
     public delegate void MessageReceived([MarshalAs(UnmanagedType.LPStr)] string UserId,
         [MarshalAs(UnmanagedType.LPStr)]string MessageId,
         long time,
         /*MessageContent*/
         MessageContentType type,
         bool encrypted,
-        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 6)][In,Out] byte[] Message, 
+        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 6)][In, Out] byte[] Message,
         int mesLen);
-    public enum MessageStatus
+
+
+
+    public static partial class MessengerInterop
     {
-        Sending,
-        Sent,
-        FailedToSend,
-        Delivered,
-        Seen
-    };
-
-    public enum MessageContentType
-    {
-        Text,
-        Image,
-        Video
-    };
-
-
-    public static class MessengerInterop
-    {
-        public static class DateTimeConversion
-        {
-            public static DateTime UnixTimeToDateTime(long unixTime)
-            {
-                return UnixStartTime.AddSeconds(Convert.ToDouble(unixTime));
-            }
-            private static readonly DateTime UnixStartTime = new DateTime(
-            1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-        }
-        public class MessageResult
-        {
-            public delegate void MessageResultHandler();
-            public event MessageResultHandler StatusChangedEvent;
-            public event MessageResultHandler MessageReceivedEvent;
-
-            public string MessageId { get; private set; }
-            public MessageStatus Status { get; private set; }
-            public string UserId { get; private set; }
-            public byte[] Message { get; private set; }
-            public int MessageLength { get; private set; }
-            public string ReceivedMessageId { get; private set; }
-            public bool ReceivedMessageEncrypted { get; private set; }
-            public MessageContentType ReceivedMesType { get; private set; }
-            public DateTime Time { get; private set; }
-
-            public void StatusChanged(string MessageId, MessageStatus status)
-            {
-                this.MessageId = MessageId;
-                this.Status = status;
-                StatusChangedEvent();
-            }
-            public void MessageReceived(string UserId, 
-                string MessageId,
-                long time,
-            /*MessageContent*/
-            MessageContentType type,
-            bool encrypted, 
-            byte[] Message, 
-            int mesLen)
-            {
-                this.UserId = UserId;
-                this.Message = Message;
-                this.MessageLength = mesLen;
-                ReceivedMessageId = MessageId;
-                ReceivedMessageEncrypted = encrypted;
-                ReceivedMesType = type;
-                Time = DateTimeConversion.UnixTimeToDateTime(time);
-
-                MessageReceivedEvent();
-                SendMessageSeen(UserId, ReceivedMessageId);
-            }
-        }
-
-        public class UsersListHandler
-        {
-            public void UsersLoaded(string[] users, int length)
-            {
-
-            }
-        }
-
+        public delegate void MessageResultHandler();
         public static void Init()
         {
             Init("127.0.0.1", 5222);
         }
 
-        [DllImport("NativeLinker.dll" , CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void Init([MarshalAs(UnmanagedType.LPStr)] string url, ushort port);
 
-        [DllImport("NativeLinker.dll" , CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void Login([MarshalAs(UnmanagedType.LPStr)] string login, [MarshalAs(UnmanagedType.LPStr)] string password, IntPtr loginCallback);
 
         [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -133,16 +47,16 @@ namespace SBMessenger
         public static extern void Disconnect();
 
 
-        [DllImport("NativeLinker.dll" , CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void SendMessage([MarshalAs(UnmanagedType.LPStr)] string recepientId, [MarshalAs(UnmanagedType.LPStr)] string msg, int msg_len);
-        [DllImport("NativeLinker.dll" , CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void SendComplexMessage([MarshalAs(UnmanagedType.LPStr)] string recepientId,
         MessageContentType type,
         bool encrypted,
-        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)][In,Out] byte[] msg,
+        [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)][In, Out] byte[] msg,
         int msg_len);
 
-        [DllImport("NativeLinker.dll" , CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void SendMessageSeen([MarshalAs(UnmanagedType.LPStr)] string userId, [MarshalAs(UnmanagedType.LPStr)] string msgId);
 
         [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
@@ -156,19 +70,20 @@ namespace SBMessenger
             Login(login, password, loginCallback);
             return task.Task;
         }
-        public static MessageResult res = new MessageResult();
+        public static MessageReceivedResult mRres = new MessageReceivedResult();
+        public static StatusChangedResult stCres = new StatusChangedResult();
         private static StatusChanged StChDeleg;
         private static MessageReceived MesRecdeleg;
         public static void RegisterObserver()
         {
-            StChDeleg = new StatusChanged(res.StatusChanged);
+            StChDeleg = new StatusChanged(stCres.StatusChanged);
             IntPtr statusCallback = Marshal.GetFunctionPointerForDelegate(StChDeleg);
-            MesRecdeleg = new MessageReceived(res.MessageReceived);
+            MesRecdeleg = new MessageReceived(mRres.MessageReceived);
             IntPtr messageCallback = Marshal.GetFunctionPointerForDelegate(MesRecdeleg);
             RegisterObserver(statusCallback, messageCallback);
         }
         private static UsersResultCallback usersResultCallback;
-        public static UsersListHandler urh = new UsersListHandler();
+        public static UsersListResult urh = new UsersListResult();
         public static void RequestActiveUsers()
         {
             usersResultCallback = new UsersResultCallback(urh.UsersLoaded);

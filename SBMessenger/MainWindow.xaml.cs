@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,31 +17,31 @@ namespace SBMessenger
         public MainWindow()
         {
             InitializeComponent();
-            MessengerInterop.MessageResult.MessageResultHandler handler = delegate ()
+            MessengerInterop.MessageResultHandler handler = delegate ()
             {
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    string mes = Encoding.UTF8.GetString(MessengerInterop.res.Message);
+                    string mes = Encoding.UTF8.GetString(MessengerInterop.mRres.Message);
                     mes = mes.Remove(mes.Length - 1);
                     SuccessToaster.Toast(message: mes + " " + receiver_id, animation: netoaster.ToasterAnimation.FadeIn);
                 });
             };
-            
-            MessengerInterop.MessageResult.MessageResultHandler handler1 = delegate ()
+
+            MessengerInterop.MessageResultHandler handler1 = delegate ()
             {
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    string mes = "Message is " + Enum.GetName(typeof(MessageStatus), MessengerInterop.res.Status);
+                    string mes = "Message is " + Enum.GetName(typeof(MessageStatus), MessengerInterop.stCres.Status);
                     ErrorToaster.Toast(message: mes, animation: netoaster.ToasterAnimation.FadeIn);
-                    
+
                 });
 
 
             };
-            MessengerInterop.res.StatusChangedEvent += handler1;
-            MessengerInterop.res.MessageReceivedEvent += handler;
+            MessengerInterop.stCres.StatusChangedEvent += handler1;
+            MessengerInterop.mRres.MessageReceivedEvent += handler;
         }
 
 
