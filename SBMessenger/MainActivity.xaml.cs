@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -22,6 +23,7 @@ namespace SBMessenger
     /// </summary>
     public partial class MainActivity : Window
     {
+        List<Messenge> items;
         public MainActivity()
         {
             InitializeComponent();
@@ -65,11 +67,8 @@ namespace SBMessenger
             MessengerInterop.urh.UsersChangedEvent += usersRequestHandler;
             showDialog();
 
-            List<Messenge> items = new List<Messenge>();
-            items.Add(new Messenge() { UserName = "John Doe", Text = "john@doe-family.com", Time="Today" });
-            items.Add(new Messenge() { UserName = "Jane Doe", Text = "jane@doe-family.com", Time = "Today" });
-            items.Add(new Messenge() { UserName = "Sammy Doe", Text = "sammy.doe@gmail.com", Time = "Today" });
-            MessagesLV.ItemsSource = items;
+            items = new List<Messenge>();
+            
         }
         void showDialog()
         {
@@ -84,6 +83,9 @@ namespace SBMessenger
         {
             CurrentUser= (string)e.AddedItems[0];
             UserName.Content = CurrentUser;
+            items = new List<Messenge>();
+            items.Add(new Messenge() { UserName = "UserName", Text = "Text", Time = "Time" });
+            MessagesLV.ItemsSource = items;
         }
 
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)
@@ -93,6 +95,9 @@ namespace SBMessenger
             {
                 byte[] mesg = Encoding.UTF8.GetBytes(msg + '\0');
                 MessengerInterop.SendComplexMessage(CurrentUser, MessageContentType.Text, false, mesg, mesg.Length);
+                items.Add(new Messenge() { UserName = MessengerInterop.UserName, Text = msg, Time = DateTime.Now.ToShortTimeString() });
+                ICollectionView view = CollectionViewSource.GetDefaultView(items);
+                view.Refresh();
             }
             else
             {

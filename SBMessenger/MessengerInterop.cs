@@ -74,6 +74,7 @@ namespace SBMessenger
             var loginCallback = Marshal.GetFunctionPointerForDelegate(
             new LoginCallback(task.SetResult));
             Login(login, password, loginCallback);
+            UserName = login;
             return task.Task;
         }
         public static MessageReceivedResult mRres = new MessageReceivedResult();
@@ -96,5 +97,6 @@ namespace SBMessenger
             IntPtr usResCb = Marshal.GetFunctionPointerForDelegate(usersResultCallback);
             RequestActiveUsers(usResCb);
         }
+        public static string UserName { get; private set; }
     }
 }
