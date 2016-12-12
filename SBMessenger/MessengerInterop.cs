@@ -62,6 +62,12 @@ namespace SBMessenger
         [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void RequestActiveUsers(IntPtr reqUserCallback);
 
+        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern encryption_algorithm_type GetUserEncryption([MarshalAs(UnmanagedType.LPStr)]string userId);
+
+        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern byte[] GetPublicKey(string userId);
+
         public static Task<OperationResult> Login(string login, string password)
         {
             var task = new TaskCompletionSource<OperationResult>();
