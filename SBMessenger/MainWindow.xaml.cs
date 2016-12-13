@@ -14,7 +14,6 @@ namespace SBMessenger
     /// </summary>
     public partial class MainActivity : Window
     {
-        //List<Messenge> items;
         public MainActivity()
         {
             InitializeComponent();
@@ -31,10 +30,6 @@ namespace SBMessenger
                     MessengerInterop.Users[user].unreadMesages += 1;
                     ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
                     view.Refresh();
-                    //string mes = Encoding.UTF8.GetString(MessengerInterop.mRres.Message);
-                    //mes = mes.Remove(mes.Length - 1);
-
-                    //SuccessToaster.Toast(message: mes, animation: netoaster.ToasterAnimation.FadeIn);
                 });
             };
 
@@ -43,9 +38,8 @@ namespace SBMessenger
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    //string mes = "Message is " + Enum.GetName(typeof(MessageStatus), MessengerInterop.stCres.Status);
-                    //ErrorToaster.Toast(message: mes, animation: netoaster.ToasterAnimation.FadeIn);
-
+                    ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessages[CurrentUser]);
+                    view.Refresh();
                 });
             };
 
@@ -75,11 +69,21 @@ namespace SBMessenger
             aboutWindow.ShowDialog();
         }
         string CurrentUser = "";
+        //Message CurrentMessage;
 
         private void UsersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            CurrentUser = ((User)e.AddedItems[0]).UserID;
+            if (e.AddedItems.Count > 0)
+            {
+                CurrentUser = ((User)e.AddedItems[0]).UserID;
+            }
             UserName.Content = CurrentUser;
+            for (int i = 0; i < MessengerInterop.Users[CurrentUser].unreadMesages; i++)
+            {
+                int count = MessengerInterop.UsersMessages[CurrentUser].Count;
+                string ReceivedMessageId = MessengerInterop.UsersMessages[CurrentUser][count - i - 1].MessageId;
+                MessengerInterop.SendMessageSeen(CurrentUser, ReceivedMessageId);
+            }
             MessengerInterop.Users[CurrentUser].unreadMesages = 0;
             ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
             view.Refresh();
@@ -92,8 +96,10 @@ namespace SBMessenger
             if (msg.Length > 0)
             {
                 byte[] mesg = Encoding.UTF8.GetBytes(msg + '\0');
+                MessengerInterop.CurrentMessage = new Message(MessengerInterop.UserName, msg, DateTime.Now);
                 MessengerInterop.SendComplexMessage(CurrentUser, MessageContentType.Text, false, mesg, mesg.Length);
-                MessengerInterop.UsersMessages[CurrentUser].Add(new Message(MessengerInterop.UserName, msg, DateTime.Now));
+                
+                MessengerInterop.UsersMessages[CurrentUser].Add(MessengerInterop.CurrentMessage);
                 ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessages[CurrentUser]);
                 view.Refresh();
             }
@@ -107,11 +113,6 @@ namespace SBMessenger
         {
             MessengerInterop.Disconnect();
             base.OnClosed(e);
-        }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void ResreshButton_Click(object sender, RoutedEventArgs e)
