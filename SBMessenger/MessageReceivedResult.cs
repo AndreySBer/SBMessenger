@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace SBMessenger
 {
@@ -28,7 +29,13 @@ namespace SBMessenger
             int mesLen)
             {
                 DateTime Time = DateTimeConversion.UnixTimeToDateTime(time);
-                UsersMessenges[UserId].Add(new Message(UserId, Time, type, encrypted, Message));
+                //костыль   
+                if (!UsersMessages.ContainsKey(UserId))
+                {
+                    UsersMessages.Add(UserId, new List<Message>());
+                    Users.Add(UserId, new User(UserId));
+                }
+                UsersMessages[UserId].Add(new Message(UserId, Time, type, encrypted, Message));
                 this.UserId = UserId;
                 MessageReceivedEvent?.Invoke();
                 //SendMessageSeen(UserId, ReceivedMessageId);

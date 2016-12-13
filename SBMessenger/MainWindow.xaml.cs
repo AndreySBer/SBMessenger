@@ -18,7 +18,7 @@ namespace SBMessenger
         public MainActivity()
         {
             InitializeComponent();
-            this.DataContext = MessengerInterop.UsersMessenges;
+            this.DataContext = MessengerInterop.UsersMessages;
             this.Show();
 
 
@@ -27,6 +27,10 @@ namespace SBMessenger
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
+                    string user = MessengerInterop.mRres.UserId;
+                    MessengerInterop.Users[user].unreadMesages += 1;
+                    ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
+                    view.Refresh();
                     //string mes = Encoding.UTF8.GetString(MessengerInterop.mRres.Message);
                     //mes = mes.Remove(mes.Length - 1);
 
@@ -50,7 +54,7 @@ namespace SBMessenger
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    UsersList.ItemsSource = MessengerInterop.UsersMessenges.Keys;
+                    UsersList.ItemsSource = MessengerInterop.Users.Values;
                     CurrentUser = MessengerInterop.UserName;
                 });
             };
@@ -73,9 +77,9 @@ namespace SBMessenger
 
         private void UsersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            CurrentUser = (string)e.AddedItems[0];
+            CurrentUser = ((User)e.AddedItems[0]).UserID;
             UserName.Content = CurrentUser;
-            MessagesLV.ItemsSource = MessengerInterop.UsersMessenges[CurrentUser];
+            MessagesLV.ItemsSource = MessengerInterop.UsersMessages[CurrentUser];
         }
 
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)
@@ -85,8 +89,8 @@ namespace SBMessenger
             {
                 byte[] mesg = Encoding.UTF8.GetBytes(msg + '\0');
                 MessengerInterop.SendComplexMessage(CurrentUser, MessageContentType.Text, false, mesg, mesg.Length);
-                MessengerInterop.UsersMessenges[CurrentUser].Add(new Message(MessengerInterop.UserName, msg, DateTime.Now));
-                ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessenges[CurrentUser]);
+                MessengerInterop.UsersMessages[CurrentUser].Add(new Message(MessengerInterop.UserName, msg, DateTime.Now));
+                ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessages[CurrentUser]);
                 view.Refresh();
             }
             else

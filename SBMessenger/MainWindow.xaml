@@ -6,6 +6,16 @@
         xmlns:local="clr-namespace:SBMessenger"
         mc:Ignorable="d"
         Title="Safeboard Messenger" Height="600" Width="1024">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <Style x:Key="UserName" TargetType="Label">
+            <Setter Property="Control.Padding" Value="16"/>
+            <Setter Property="Background" Value="#006d55"/>
+            <Setter Property="Control.Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Cone"/>
+            <Setter Property="FontSize" Value="24"/>
+        </Style>
+    </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
@@ -27,9 +37,19 @@
                 <RowDefinition Height="1*"/>
             </Grid.RowDefinitions>
             <ListView x:Name="UsersList" Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" 
-                      SelectionMode="Single" SelectionChanged="UsersList_SelectionChanged"/>
-
-            <Label x:Name="UserName" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"/>
+                      SelectionMode="Single" SelectionChanged="UsersList_SelectionChanged">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding UserID}" FontWeight="Bold"/>
+                            <Border BorderBrush="#FF000000" BorderThickness="1" CornerRadius="8">
+                                <TextBlock Text="{Binding unreadMesages}" Visibility="{Binding hasUnreadMesages,  Converter={StaticResource BooleanToVisibilityConverter} }"/>
+                            </Border>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Label x:Name="UserName" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource UserName}" Content="andrey@test"/>
             <ListView x:Name="MessagesLV" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
                 <ListView.ItemTemplate>
                     <DataTemplate>
@@ -40,7 +60,7 @@
                             </StackPanel>
                             <TextBlock Text="{Binding Text}"  />
                         </StackPanel>
-                        
+
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
