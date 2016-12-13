@@ -44,7 +44,7 @@
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <TextBox x:Name="MessageText" Grid.Column="1" Grid.Row="2" SpellCheck.IsEnabled="True" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow"/>
+            <TextBox x:Name="MessageText" Grid.Column="1" Grid.Row="2" SpellCheck.IsEnabled="True" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" Width="581"/>
             <Button x:Name="SendMessageButton" Content="Send" Padding="10" Grid.Column="2" Grid.Row="2" Click="SendMessageButton_Click"/>
         </Grid>
     </DockPanel>
