@@ -55,6 +55,7 @@ namespace SBMessenger
                 (ThreadStart)delegate ()
                 {
                     UsersList.ItemsSource = MessengerInterop.Users.Values;
+                    usersCounter.Text = MessengerInterop.Users.Count + " пользователей онлайн";
                     CurrentUser = MessengerInterop.UserName;
                 });
             };
@@ -106,6 +107,16 @@ namespace SBMessenger
         {
             MessengerInterop.Disconnect();
             base.OnClosed(e);
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void ResreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessengerInterop.RequestActiveUsers();
         }
     }
 }

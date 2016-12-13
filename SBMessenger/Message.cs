@@ -6,7 +6,7 @@ namespace SBMessenger
 {
     public class Message
     {
-        
+
 
         public string UserName { get; private set; }
         public DateTime time { get; private set; }
@@ -24,7 +24,9 @@ namespace SBMessenger
             Type = type;
             Encrypted = encrypted;
             Data = message;
-            Text = (Type == MessageContentType.Text) ? Encoding.UTF8.GetString(message).Remove(message.Length - 1) : Type.ToString();
+            Text = (Type == MessageContentType.Text && !Encrypted) ? 
+                Encoding.UTF8.GetString(message).Remove(message.Length - 1) : 
+                Type.ToString() + (Encrypted ? "Encrypted" : "Not encrypted");
         }
 
         //temporary constructor for add messages when sending

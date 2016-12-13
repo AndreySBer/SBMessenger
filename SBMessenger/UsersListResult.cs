@@ -21,10 +21,12 @@ namespace SBMessenger
                     Users.Add(temp.UserID, temp);
                 }
                 UsersChangedEvent?.Invoke();
+                
             }
         }
 
         public static Dictionary<string, List<Message>> UsersMessages { get; set; }
         public static Dictionary<string,User> Users { get; set; }
+        
     }
 }

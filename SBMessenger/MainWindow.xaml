@@ -8,68 +8,68 @@
         Title="Safeboard Messenger" Height="600" Width="1024">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+
         <Style x:Key="UserName" TargetType="Label">
             <Setter Property="Control.Padding" Value="8"/>
             <Setter Property="Background" Value="#006d55"/>
             <Setter Property="Control.Foreground" Value="White"/>
-            <!--<Setter Property="FontFamily" Value="Cone"/>-->
             <Setter Property="FontSize" Value="20"/>
         </Style>
     </Window.Resources>
-    <DockPanel>
-        <Menu DockPanel.Dock="Top">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Preferences" />
-                <Separator />
-                <MenuItem Header="_Exit" />
-            </MenuItem>
-        </Menu>
-        <Grid DockPanel.Dock="Bottom">
-
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="4*"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="1*"/>
-                <RowDefinition Height="8*"/>
-                <RowDefinition Height="1*"/>
-            </Grid.RowDefinitions>
-            <ListView x:Name="UsersList" Grid.Column="0" Grid.Row="0" Grid.RowSpan="3" 
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1*"/>
+            <RowDefinition Height="8*"/>
+            <RowDefinition Height="1*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+            <Button x:Name="ResreshButton"  Margin="8" 
+                    Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" 
+                    Click="ResreshButton_Click">
+                <Button.Background>
+                    <ImageBrush ImageSource="Resources/ic_refresh_white.png"/>
+                </Button.Background>
+            </Button>
+            <TextBlock x:Name="usersCounter"  VerticalAlignment="Center"/>
+        </StackPanel>
+        <ListView x:Name="UsersList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" 
                       SelectionMode="Single" SelectionChanged="UsersList_SelectionChanged">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding UserID}" FontWeight="Bold" VerticalAlignment="Center"/>
-                            <Border CornerRadius="10" Background="#006d55" Width="20" Height="20" 
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding UserID}" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Border CornerRadius="10" Background="#006d55" Width="20" Height="20" 
                                     Margin="8" HorizontalAlignment="Right"
                                     Visibility="{Binding hasUnreadMesages,  Converter={StaticResource BooleanToVisibilityConverter} }">
-                                <TextBlock Text="{Binding unreadMesages}" 
+                            <TextBlock Text="{Binding unreadMesages}" 
                                             
                                            HorizontalAlignment="Center" Foreground='White' VerticalAlignment="Center" />
-                            </Border>
+                        </Border>
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <Label x:Name="UserName" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource UserName}"/>
+        <ListView x:Name="MessagesLV" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Vertical" Margin="4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding UserName}" FontWeight="Bold" Margin="0,4"/>
+                            <TextBlock Text="{Binding Time}" Margin="16,4" Foreground="Gray" />
                         </StackPanel>
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-            <Label x:Name="UserName" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource UserName}"/>
-            <ListView x:Name="MessagesLV" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
-                <ListView.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Vertical" Margin="4">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding UserName}" FontWeight="Bold" Margin="0,4"/>
-                                <TextBlock Text="{Binding Time}" Margin="16,4" Foreground="Gray" />
-                            </StackPanel>
-                            <TextBlock Text="{Binding Text}"  />
-                        </StackPanel>
+                        <TextBlock Text="{Binding Text}"  />
+                    </StackPanel>
 
-                    </DataTemplate>
-                </ListView.ItemTemplate>
-            </ListView>
-            <TextBox x:Name="MessageText" Grid.Column="1" Grid.Row="2" SpellCheck.IsEnabled="True" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" Width="581"/>
-            <Button x:Name="SendMessageButton" Content="Send" Padding="10" Grid.Column="2" Grid.Row="2" Click="SendMessageButton_Click"/>
-        </Grid>
-    </DockPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+        <TextBox x:Name="MessageText" Grid.Column="1" Grid.Row="2" SpellCheck.IsEnabled="True" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" Width="581"/>
+        <Button x:Name="SendMessageButton" Content="Send" Padding="10" Grid.Column="2" Grid.Row="2" Click="SendMessageButton_Click"/>
+    </Grid>
 </Window>
