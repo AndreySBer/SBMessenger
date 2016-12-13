@@ -41,22 +41,22 @@
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{Binding UserID}" FontWeight="Bold"/>
-                            <Border BorderBrush="#FF000000" BorderThickness="1" CornerRadius="8">
-                                <TextBlock Text="{Binding unreadMesages}" Visibility="{Binding hasUnreadMesages,  Converter={StaticResource BooleanToVisibilityConverter} }"/>
+                            <TextBlock Text="{Binding UserID}" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <Border CornerRadius="10" Background="#006d55" Width="20" Height="20" Margin="8" HorizontalAlignment="Right">
+                                <TextBlock Text="{Binding unreadMesages}" Visibility="{Binding hasUnreadMesages,  Converter={StaticResource BooleanToVisibilityConverter} }" HorizontalAlignment="Center" Foreground='White' VerticalAlignment="Center" />
                             </Border>
                         </StackPanel>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Label x:Name="UserName" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource UserName}" Content="andrey@test"/>
+            <Label x:Name="UserName" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource UserName}"/>
             <ListView x:Name="MessagesLV" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Vertical" Margin="4">
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding UserName}" FontWeight="Bold" />
-                                <TextBlock Text="{Binding Time}"  />
+                                <TextBlock Text="{Binding UserName}" FontWeight="Bold" Margin="0,4"/>
+                                <TextBlock Text="{Binding Time}" Margin="16,4" Foreground="Gray" />
                             </StackPanel>
                             <TextBlock Text="{Binding Text}"  />
                         </StackPanel>

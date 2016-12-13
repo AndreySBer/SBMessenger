@@ -37,7 +37,7 @@ namespace SBMessenger
         int KeyLength { get; }
 
         public int unreadMesages { get; set; }
-        public bool hasUnreadMesages { get { return unreadMesages <= 0; } private set { } }
+        public bool hasUnreadMesages { get { return unreadMesages > 0; } private set { } }
 
         public User(string id)
         {

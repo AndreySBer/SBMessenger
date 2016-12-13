@@ -30,7 +30,14 @@ namespace SBMessenger
             ushort Port;
             try
             {
-                var eMailValidator = new System.Net.Mail.MailAddress(login.Text);
+                if (login.Text.Length > 0)
+                {
+                    var eMailValidator = new System.Net.Mail.MailAddress(login.Text);
+                }
+                else
+                {
+                    errors += "\nНеправильный логин";
+                }
                 
             }
             catch (FormatException)
