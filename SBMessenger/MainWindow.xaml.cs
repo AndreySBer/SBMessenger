@@ -43,8 +43,8 @@ namespace SBMessenger
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    string mes = "Message is " + Enum.GetName(typeof(MessageStatus), MessengerInterop.stCres.Status);
-                    ErrorToaster.Toast(message: mes, animation: netoaster.ToasterAnimation.FadeIn);
+                    //string mes = "Message is " + Enum.GetName(typeof(MessageStatus), MessengerInterop.stCres.Status);
+                    //ErrorToaster.Toast(message: mes, animation: netoaster.ToasterAnimation.FadeIn);
 
                 });
             };
@@ -79,6 +79,9 @@ namespace SBMessenger
         {
             CurrentUser = ((User)e.AddedItems[0]).UserID;
             UserName.Content = CurrentUser;
+            MessengerInterop.Users[CurrentUser].unreadMesages = 0;
+            ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
+            view.Refresh();
             MessagesLV.ItemsSource = MessengerInterop.UsersMessages[CurrentUser];
         }
 

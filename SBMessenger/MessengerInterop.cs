@@ -44,6 +44,9 @@ namespace SBMessenger
         public static extern void RegisterObserver(IntPtr statusChanged, IntPtr messageReceived);
 
         [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
+        public static extern void UnregisterObserver(IntPtr statusChanged, IntPtr messageReceived);
+
+        [DllImport("NativeLinker.dll", CallingConvention = CallingConvention.Cdecl)]
         public static extern void Disconnect();
 
 
@@ -89,6 +92,12 @@ namespace SBMessenger
             IntPtr messageCallback = Marshal.GetFunctionPointerForDelegate(MesRecdeleg);
             RegisterObserver(statusCallback, messageCallback);
         }
+        public static void UnregisterObserver()
+        {
+            IntPtr statusCallback = Marshal.GetFunctionPointerForDelegate(StChDeleg);
+            IntPtr messageCallback = Marshal.GetFunctionPointerForDelegate(MesRecdeleg);
+            UnregisterObserver(statusCallback, messageCallback);
+        }
         private static UsersResultCallback usersResultCallback;
         public static UsersListResult urh = new UsersListResult();
         public static void RequestActiveUsers()
@@ -100,6 +109,6 @@ namespace SBMessenger
         public static string UserName { get; private set; }
 
 
-        
+
     }
 }
