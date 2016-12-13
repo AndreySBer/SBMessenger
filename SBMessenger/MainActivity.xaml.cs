@@ -23,22 +23,23 @@ namespace SBMessenger
     /// </summary>
     public partial class MainActivity : Window
     {
-        List<Messenge> items;
+        //List<Messenge> items;
         public MainActivity()
         {
             InitializeComponent();
-            this.DataContext = MessengerInterop.Users;
+            this.DataContext = MessengerInterop.UsersMessenges;
             this.Show();
-           
+
 
             MessengerInterop.MessageResultHandler messageReceivedHandler = delegate ()
             {
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    string mes = Encoding.UTF8.GetString(MessengerInterop.mRres.Message);
-                    mes = mes.Remove(mes.Length - 1);
-                    SuccessToaster.Toast(message: mes, animation: netoaster.ToasterAnimation.FadeIn);
+                    //string mes = Encoding.UTF8.GetString(MessengerInterop.mRres.Message);
+                    //mes = mes.Remove(mes.Length - 1);
+
+                    //SuccessToaster.Toast(message: mes, animation: netoaster.ToasterAnimation.FadeIn);
                 });
             };
 
@@ -58,8 +59,8 @@ namespace SBMessenger
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    UsersList.ItemsSource = MessengerInterop.Users.Select<User, String>(u => u.UserID);
-                    CurrentUser = MessengerInterop.Users[0].UserID;
+                    UsersList.ItemsSource = MessengerInterop.UsersMessenges.Keys;
+                    CurrentUser = MessengerInterop.UserName;
                 });
             };
             MessengerInterop.mRres.MessageReceivedEvent += messageReceivedHandler;
@@ -67,8 +68,8 @@ namespace SBMessenger
             MessengerInterop.urh.UsersChangedEvent += usersRequestHandler;
             showDialog();
 
-            items = new List<Messenge>();
-            
+
+
         }
         void showDialog()
         {
@@ -81,11 +82,9 @@ namespace SBMessenger
 
         private void UsersList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            CurrentUser= (string)e.AddedItems[0];
+            CurrentUser = (string)e.AddedItems[0];
             UserName.Content = CurrentUser;
-            items = new List<Messenge>();
-            items.Add(new Messenge() { UserName = "UserName", Text = "Text", Time = "Time" });
-            MessagesLV.ItemsSource = items;
+            MessagesLV.ItemsSource = MessengerInterop.UsersMessenges[CurrentUser];
         }
 
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)
@@ -95,8 +94,8 @@ namespace SBMessenger
             {
                 byte[] mesg = Encoding.UTF8.GetBytes(msg + '\0');
                 MessengerInterop.SendComplexMessage(CurrentUser, MessageContentType.Text, false, mesg, mesg.Length);
-                items.Add(new Messenge() { UserName = MessengerInterop.UserName, Text = msg, Time = DateTime.Now.ToShortTimeString() });
-                ICollectionView view = CollectionViewSource.GetDefaultView(items);
+                MessengerInterop.UsersMessenges[CurrentUser].Add(new Message(MessengerInterop.UserName, msg, DateTime.Now));
+                ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessenges[CurrentUser]);
                 view.Refresh();
             }
             else
@@ -105,12 +104,10 @@ namespace SBMessenger
             }
         }
 
-        public class Messenge
+        protected override void OnClosed(EventArgs e)
         {
-            public string UserName { get; set; }
-            public string Time { get; set; }
-            public string Text { get; set; }
-            
+            MessengerInterop.Disconnect();
+            base.OnClosed(e);
         }
     }
 }

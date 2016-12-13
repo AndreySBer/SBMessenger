@@ -98,5 +98,8 @@ namespace SBMessenger
             RequestActiveUsers(usResCb);
         }
         public static string UserName { get; private set; }
+
+
+        
     }
 }

@@ -22,9 +22,9 @@ namespace SBMessenger
                 this.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
                 (ThreadStart)delegate ()
                 {
-                    string mes = Encoding.UTF8.GetString(MessengerInterop.mRres.Message);
-                    mes = mes.Remove(mes.Length - 1);
-                    SuccessToaster.Toast(message: mes + " " + receiver_id, animation: netoaster.ToasterAnimation.FadeIn);
+                    //string mes = Encoding.UTF8.GetString(MessengerInterop.mRres.Message);
+                    //mes = mes.Remove(mes.Length - 1);
+                    //SuccessToaster.Toast(message: mes + " " + receiver_id, animation: netoaster.ToasterAnimation.FadeIn);
                 });
             };
 

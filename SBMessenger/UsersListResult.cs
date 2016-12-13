@@ -12,18 +12,19 @@ namespace SBMessenger
 
             public void UsersLoaded(string[] users, int length)
             {
-                Users = new List<User>();
+                UsersMessenges = new Dictionary<string, List<Message>>();
+                Users = new Dictionary<string, User>();
                 foreach (string i in users)
                 {
-                    Users.Add(new SBMessenger.User(i));
+                    User temp = new SBMessenger.User(i);
+                    UsersMessenges.Add(temp.UserID, new List<Message>());
+                    Users.Add(temp.UserID, temp);
                 }
                 UsersChangedEvent?.Invoke();
             }
         }
-        public static List<User> Users
-        {
-            get;
-            set;
-        }
+
+        public static Dictionary<string, List<Message>> UsersMessenges { get; set; }
+        public static Dictionary<string,User> Users { get; set; }
     }
 }

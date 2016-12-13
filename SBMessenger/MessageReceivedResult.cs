@@ -10,12 +10,12 @@ namespace SBMessenger
             public event MessageResultHandler MessageReceivedEvent;
 
             public string UserId { get; private set; }
-            public byte[] Message { get; private set; }
-            public int MessageLength { get; private set; }
-            public string ReceivedMessageId { get; private set; }
-            public bool ReceivedMessageEncrypted { get; private set; }
-            public MessageContentType ReceivedMesType { get; private set; }
-            public DateTime Time { get; private set; }
+            //public byte[] Message { get; private set; }
+            //public int MessageLength { get; private set; }
+            //public string ReceivedMessageId { get; private set; }
+            //public bool ReceivedMessageEncrypted { get; private set; }
+            //public MessageContentType ReceivedMesType { get; private set; }
+            //public DateTime Time { get; private set; }
 
             
             public void MessageReceived(string UserId,
@@ -27,16 +27,11 @@ namespace SBMessenger
             byte[] Message,
             int mesLen)
             {
+                DateTime Time = DateTimeConversion.UnixTimeToDateTime(time);
+                UsersMessenges[UserId].Add(new Message(UserId, Time, type, encrypted, Message));
                 this.UserId = UserId;
-                this.Message = Message;
-                this.MessageLength = mesLen;
-                ReceivedMessageId = MessageId;
-                ReceivedMessageEncrypted = encrypted;
-                ReceivedMesType = type;
-                Time = DateTimeConversion.UnixTimeToDateTime(time);
-
-                MessageReceivedEvent();
-                SendMessageSeen(UserId, ReceivedMessageId);
+                MessageReceivedEvent?.Invoke();
+                //SendMessageSeen(UserId, ReceivedMessageId);
             }
         }
     }
