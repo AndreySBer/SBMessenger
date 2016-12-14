@@ -93,7 +93,13 @@ namespace SBMessenger
                         MessengerInterop.RequestActiveUsers();
                         break;
                     case OperationResult.AuthError: ErrorToaster.Toast(message: "AuthError"); break;
-                    case OperationResult.NetworkError: ErrorToaster.Toast(message: "NetworkError"); break;
+                    case OperationResult.NetworkError:
+                        {
+                            ErrorToaster.Toast(message: "NetworkError");
+                            MessengerInterop.Disconnect();
+                            showDialog();
+                            break;
+                        }
                     case OperationResult.InternalError: ErrorToaster.Toast(message: "InternalError"); break;
                 }
             }
