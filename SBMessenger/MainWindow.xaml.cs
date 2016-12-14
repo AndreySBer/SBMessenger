@@ -31,8 +31,14 @@ namespace SBMessenger
                 {
                     string user = MessengerInterop.mRres.UserId;
                     MessengerInterop.Users[user].unreadMesages += 1;
+                    SuccessToaster.Toast(message: "Новое сообщение от " + user, animation: netoaster.ToasterAnimation.FadeIn);
                     ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
                     view.Refresh();
+                    if (CurrentUser == user)
+                    {
+                        view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
+                        view.Refresh();
+                    }
                 });
             };
 
@@ -79,7 +85,7 @@ namespace SBMessenger
                 switch (task.Result)
                 {
                     case OperationResult.Ok:
-                        SuccessToaster.Toast(message: "Успех", animation: netoaster.ToasterAnimation.FadeIn);
+                        //SuccessToaster.Toast(message: "Успех", animation: netoaster.ToasterAnimation.FadeIn);
                         MessengerInterop.RegisterObserver();
                         MessengerInterop.RequestActiveUsers();
                         break;
@@ -91,12 +97,12 @@ namespace SBMessenger
         }
         void showDialog()
         {
-            
-                LoginWindow aboutWindow = new LoginWindow();
-                aboutWindow.Owner = this;
-                aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                aboutWindow.ShowDialog();
-            
+
+            LoginWindow aboutWindow = new LoginWindow();
+            aboutWindow.Owner = this;
+            aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+            aboutWindow.ShowDialog();
+
         }
         string CurrentUser = "";
         //Message CurrentMessage;
@@ -130,7 +136,7 @@ namespace SBMessenger
                 MessengerInterop.SendComplexMessage(CurrentUser, MessageContentType.Text, false, mesg, mesg.Length);
 
                 MessengerInterop.UsersMessages[CurrentUser].Add(MessengerInterop.CurrentMessage);
-                SQLiteConnector.AddMessage(MessengerInterop.CurrentMessage,MessengerInterop.UserName);
+                SQLiteConnector.AddMessage(MessengerInterop.CurrentMessage, MessengerInterop.UserName);
                 ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessages[CurrentUser]);
                 view.Refresh();
             }
