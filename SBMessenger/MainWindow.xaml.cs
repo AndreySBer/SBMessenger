@@ -125,6 +125,7 @@ namespace SBMessenger
                 MessengerInterop.SendComplexMessage(CurrentUser, MessageContentType.Text, false, mesg, mesg.Length);
 
                 MessengerInterop.UsersMessages[CurrentUser].Add(MessengerInterop.CurrentMessage);
+                SQLiteConnector.AddMessage(MessengerInterop.CurrentMessage,MessengerInterop.UserName);
                 ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessages[CurrentUser]);
                 view.Refresh();
             }

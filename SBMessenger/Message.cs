@@ -10,7 +10,7 @@ namespace SBMessenger
         public string MessageId { get;  set; }
         public string UserName { get; private set; }
         public DateTime time { get; private set; }
-        public string Time { get;  set; }
+        public string State { get;  set; }
         public string Text { get; private set; }
         public MessageContentType Type { get; private set; }
         public bool Encrypted { get; private set; }
@@ -39,7 +39,7 @@ namespace SBMessenger
             Encrypted = false;
             Data = Encoding.UTF8.GetBytes(text + '\0');
             Text = text;
-            Time = "Отправка";
+            State = "Отправка";
         }
     }
 }

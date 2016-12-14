@@ -12,13 +12,25 @@ namespace SBMessenger
 
             public void UsersLoaded(string[] users, int length)
             {
-                UsersMessages = new Dictionary<string, List<Message>>();
+                
+                UsersMessages = SQLiteConnector.GetSavedMessages(MessengerInterop.UserName);
                 Users = new Dictionary<string, User>();
+                if (UsersMessages == null)
+                {
+                    UsersMessages = new Dictionary<string, List<Message>>();
+                }
+                foreach (string i in UsersMessages.Keys)
+                {
+                    Users.Add(i, new SBMessenger.User(i));
+                }
                 foreach (string i in users)
                 {
-                    User temp = new SBMessenger.User(i);
-                    UsersMessages.Add(temp.UserID, new List<Message>());
-                    Users.Add(temp.UserID, temp);
+                    if (!UsersMessages.ContainsKey(i))
+                    {
+                        User temp = new SBMessenger.User(i);
+                        Users.Add(temp.UserID, temp);
+                        UsersMessages.Add(temp.UserID, new List<Message>());
+                    }
                 }
                 UsersChangedEvent?.Invoke();
                 
