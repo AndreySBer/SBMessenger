@@ -32,6 +32,7 @@
                             case MessageStatus.Seen: message.State = message.time.ToShortTimeString(); break;
                             case MessageStatus.FailedToSend: message.State = "Не отправлено"; break;
                         }
+                        SQLiteConnector.EditMessageStatus(MessageId, message.State);
                     }
                 }
                 StatusChangedEvent();

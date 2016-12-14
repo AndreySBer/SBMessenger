@@ -46,6 +46,34 @@ namespace SBMessenger
             }
             return result;
         }
+
+        public static void EditMessageStatus(string messageId, string state)
+        {
+            using (SQLiteConnection conn = new SQLiteConnection(connectionString))
+            {
+                try
+                {
+                    conn.Open();
+                }
+                catch (SQLiteException) { }
+                if (conn.State == ConnectionState.Open)
+                {
+                    SQLiteCommand cmd = conn.CreateCommand();
+                    string sql_command =
+                        "UPDATE Messages" +
+                        @"SET state = '" + state + "\'"+
+                        "WHERE message_id = \'" + messageId + "\';";
+                    cmd.CommandText = sql_command;
+                    //cmd.Parameters.Add("state", DbType.String).Value = state;
+                    try
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                    catch (SQLiteException e) { Debug.WriteLine(e); }
+                }
+            }
+        }
+
         public static void AddCredentials(Credentials c, DateTime d)
         {
             using (SQLiteConnection conn = new SQLiteConnection(connectionString))
