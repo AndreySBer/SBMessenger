@@ -179,6 +179,9 @@ namespace SBMessenger
                                 (Convert.ToInt32(r["encrypted"]) == 1),
                                 (byte[])(r["data"])
                                 )
+                            {
+                                State = r["state"].ToString()
+                            }
                             );
                         }
                         r.Close();
