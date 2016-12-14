@@ -28,7 +28,7 @@ namespace SBMessenger
                     try
                     {
                         SQLiteDataReader r = cmd.ExecuteReader();
-                        
+
                         while (r.Read())
                         {
                             result = new Credentials()
@@ -155,13 +155,12 @@ namespace SBMessenger
                     SQLiteCommand cmd = conn.CreateCommand();
                     cmd.CommandText = "SELECT * "
                         + "FROM Messages "
-                        //+ "WHERE current_user_id=\""+current_user+"\""
-                        //+ "ORDER BY time ASC;";
-                        + ";";
+                        + "WHERE current_user_id=\"" + current_user + "\""
+                        + "ORDER BY time ASC;";
                     try
                     {
                         SQLiteDataReader r = cmd.ExecuteReader();
-                        
+
                         while (r.Read())
                         {
                             if (result == null)
@@ -184,7 +183,7 @@ namespace SBMessenger
                         }
                         r.Close();
                     }
-                    catch (SQLiteException e ) { Debug.WriteLine(e); }
+                    catch (SQLiteException e) { Debug.WriteLine(e); }
                 }
             }
             return result;
