@@ -59,21 +59,17 @@ namespace SBMessenger
             MessengerInterop.mRres.MessageReceivedEvent += messageReceivedHandler;
             MessengerInterop.stCres.StatusChangedEvent += changedStatusHandler;
             MessengerInterop.urh.UsersChangedEvent += usersRequestHandler;
-            showDialog();
+            getUser();
 
 
 
         }
-        
-        void showDialog()
+        void getUser()
         {
-            Credentials creds =SQLiteConnector.checkCredentials();
+            Credentials creds = SQLiteConnector.checkCredentials();
             if (creds == null)
             {
-                LoginWindow aboutWindow = new LoginWindow();
-                aboutWindow.Owner = this;
-                aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-                aboutWindow.ShowDialog();
+                showDialog();
             }
             else
             {
@@ -92,6 +88,15 @@ namespace SBMessenger
                     case OperationResult.InternalError: ErrorToaster.Toast(message: "InternalError"); break;
                 }
             }
+        }
+        void showDialog()
+        {
+            
+                LoginWindow aboutWindow = new LoginWindow();
+                aboutWindow.Owner = this;
+                aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                aboutWindow.ShowDialog();
+            
         }
         string CurrentUser = "";
         //Message CurrentMessage;
@@ -144,6 +149,12 @@ namespace SBMessenger
         private void ResreshButton_Click(object sender, RoutedEventArgs e)
         {
             MessengerInterop.RequestActiveUsers();
+        }
+
+        private void QuitButton_Click(object sender, RoutedEventArgs e)
+        {
+            MessengerInterop.Disconnect();
+            showDialog();
         }
     }
 }

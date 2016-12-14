@@ -55,6 +55,13 @@
             </ListView.ItemTemplate>
         </ListView>
         <Label x:Name="UserName" Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource UserName}"/>
+        <Button x:Name="QuitButton"  Margin="8" Grid.Column="2" Grid.Row="0"
+                    Width="{Binding ActualHeight, RelativeSource={RelativeSource Self}}" 
+                    Click="QuitButton_Click">
+            <Button.Background>
+                <ImageBrush ImageSource="Resources/ic_exit_to_app_white.png"/>
+            </Button.Background>
+        </Button>
         <ListView x:Name="MessagesLV" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2">
             <ListView.ItemTemplate>
                 <DataTemplate>
@@ -70,6 +77,7 @@
             </ListView.ItemTemplate>
         </ListView>
         <TextBox x:Name="MessageText" Grid.Column="1" Grid.Row="2" SpellCheck.IsEnabled="True" AcceptsReturn="True" AcceptsTab="True" TextWrapping="WrapWithOverflow" HorizontalAlignment="Left" Width="581"/>
-        <Button x:Name="SendMessageButton" Content="Send" Padding="10" Grid.Column="2" Grid.Row="2" Click="SendMessageButton_Click"/>
+        <Button x:Name="SendMessageButton" Content="Отправить" Padding="10" Grid.Column="2" Grid.Row="2" Click="SendMessageButton_Click"
+                Background="#006d55" Foreground="White" FontSize="20"/>
     </Grid>
 </Window>
