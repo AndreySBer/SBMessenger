@@ -24,7 +24,7 @@ namespace SBMessenger
 
         private void Login(object sender, RoutedEventArgs e)
         {
-            const int pw_min_length= 6;
+            const int pw_min_length = 6;
             string errors = "";
             IPAddress URL;
             ushort Port;
@@ -38,7 +38,7 @@ namespace SBMessenger
                 {
                     errors += "\nНеправильный логин";
                 }
-                
+
             }
             catch (FormatException)
             {
@@ -48,7 +48,7 @@ namespace SBMessenger
             {
                 errors += "\nСлишком короткий пароль";
             }
-            if (!IPAddress.TryParse(url.Text,out URL))
+            if (!IPAddress.TryParse(url.Text, out URL))
             {
                 errors += "\nНеправильный URL";
             }
@@ -60,20 +60,21 @@ namespace SBMessenger
             {
                 MessengerInterop.Init(URL.ToString(), Port);
                 Task<OperationResult> task = MessengerInterop.Login(login.Text, password.Text);
-                
+
                 switch (task.Result)
                 {
                     case OperationResult.Ok:
                         SuccessToaster.Toast(message: "Успех", animation: netoaster.ToasterAnimation.FadeIn);
                         MessengerInterop.RegisterObserver();
                         MessengerInterop.RequestActiveUsers();
+                        SQLiteConnector.AddCredentials(new Credentials() { Login = login.Text, Password = password.Text, Url = URL.ToString(), Port = Port }, DateTime.Now);
                         this.Close();
                         break;
                     case OperationResult.AuthError: ErrorToaster.Toast(message: "AuthError"); break;
                     case OperationResult.NetworkError: ErrorToaster.Toast(message: "NetworkError"); break;
                     case OperationResult.InternalError: ErrorToaster.Toast(message: "InternalError"); break;
                 }
-                
+
             }
             else
             {

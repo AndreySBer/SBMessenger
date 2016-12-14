@@ -1,7 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Data;
+using System.Data.SQLite;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -10,11 +13,11 @@ using System.Windows.Threading;
 namespace SBMessenger
 {
     /// <summary>
-    /// Interaction logic for MainActivity.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainActivity : Window
+    public partial class MainWindow : Window
     {
-        public MainActivity()
+        public MainWindow()
         {
             InitializeComponent();
             this.DataContext = MessengerInterop.UsersMessages;
@@ -61,12 +64,34 @@ namespace SBMessenger
 
 
         }
+        
         void showDialog()
         {
-            LoginWindow aboutWindow = new LoginWindow();
-            aboutWindow.Owner = this;
-            aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
-            aboutWindow.ShowDialog();
+            Credentials creds =SQLiteConnector.checkCredentials();
+            if (creds == null)
+            {
+                LoginWindow aboutWindow = new LoginWindow();
+                aboutWindow.Owner = this;
+                aboutWindow.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                aboutWindow.ShowDialog();
+            }
+            else
+            {
+                MessengerInterop.Init(creds.Url, (ushort)creds.Port);
+                Task<OperationResult> task = MessengerInterop.Login(creds.Login, creds.Password);
+
+                switch (task.Result)
+                {
+                    case OperationResult.Ok:
+                        SuccessToaster.Toast(message: "Успех", animation: netoaster.ToasterAnimation.FadeIn);
+                        MessengerInterop.RegisterObserver();
+                        MessengerInterop.RequestActiveUsers();
+                        break;
+                    case OperationResult.AuthError: ErrorToaster.Toast(message: "AuthError"); break;
+                    case OperationResult.NetworkError: ErrorToaster.Toast(message: "NetworkError"); break;
+                    case OperationResult.InternalError: ErrorToaster.Toast(message: "InternalError"); break;
+                }
+            }
         }
         string CurrentUser = "";
         //Message CurrentMessage;
@@ -98,7 +123,7 @@ namespace SBMessenger
                 byte[] mesg = Encoding.UTF8.GetBytes(msg + '\0');
                 MessengerInterop.CurrentMessage = new Message(MessengerInterop.UserName, msg, DateTime.Now);
                 MessengerInterop.SendComplexMessage(CurrentUser, MessageContentType.Text, false, mesg, mesg.Length);
-                
+
                 MessengerInterop.UsersMessages[CurrentUser].Add(MessengerInterop.CurrentMessage);
                 ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessages[CurrentUser]);
                 view.Refresh();
