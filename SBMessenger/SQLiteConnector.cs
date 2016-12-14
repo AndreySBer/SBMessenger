@@ -23,7 +23,7 @@ namespace SBMessenger
                 if (conn.State == ConnectionState.Open)
                 {
                     SQLiteCommand cmd = conn.CreateCommand();
-                    cmd.CommandText = "SELECT user_id, passw, ip, port FROM Credentials;";
+                    cmd.CommandText = "SELECT user_id, passw, ip, port FROM Credentials ORDER BY timestamp DESC LIMIT 1;";
                     try
                     {
                         SQLiteDataReader r = cmd.ExecuteReader();
