@@ -28,9 +28,9 @@
                     {
                         switch (Status)
                         {
-                            case MessageStatus.Delivered: message.Time = "Доставлено"; break;
-                            case MessageStatus.Seen: message.Time = message.time.ToShortTimeString(); break;
-                            case MessageStatus.FailedToSend: message.Time = "Не отправлено"; break;
+                            case MessageStatus.Delivered: message.State = "Доставлено"; break;
+                            case MessageStatus.Seen: message.State = message.time.ToShortTimeString(); break;
+                            case MessageStatus.FailedToSend: message.State = "Не отправлено"; break;
                         }
                     }
                 }
