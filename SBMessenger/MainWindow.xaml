@@ -68,7 +68,7 @@
                     <StackPanel Orientation="Vertical" Margin="4">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="{Binding UserName}" FontWeight="Bold" Margin="0,4"/>
-                            <TextBlock Text="{Binding Time}" Margin="16,4" Foreground="Gray" />
+                            <TextBlock Text="{Binding State}" Margin="16,4" Foreground="Gray" />
                         </StackPanel>
                         <TextBlock Text="{Binding Text}"  />
                     </StackPanel>

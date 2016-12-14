@@ -47,7 +47,7 @@ private:
 		if (statusChanged != NULL) {
 			statusChanged((char*)(msgId.c_str()), status);
 		}
-		statusChanged = NULL;
+		
 	}
 	void OnMessageReceived(const UserId& senderId, const Message& msg)override {
 		if (messageReceived != NULL) {
@@ -59,7 +59,7 @@ private:
 				vecToArray(msg.content.data),
 				msg.content.data.size());
 		}
-		messageReceived = NULL;
+		
 	}
 };
 struct UserFull
@@ -92,7 +92,7 @@ private:
 			usersArr[i].KeyLength = users[i].securityPolicy.encryptionPubKey.size();
 		}
 		if (callback != NULL) callback(res, users.size());
-		callback = NULL;
+		
 	}
 };
 

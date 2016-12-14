@@ -30,13 +30,16 @@ namespace SBMessenger
                 (ThreadStart)delegate ()
                 {
                     string user = MessengerInterop.mRres.UserId;
+                   
                     MessengerInterop.Users[user].unreadMesages += 1;
                     SuccessToaster.Toast(message: "Новое сообщение от " + user, animation: netoaster.ToasterAnimation.FadeIn);
                     ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
                     view.Refresh();
                     if (CurrentUser == user)
                     {
-                        view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
+                        markMessagesSeen();
+                        MessengerInterop.Users[user].unreadMesages = 0;
+                        view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessages.Values);
                         view.Refresh();
                     }
                 });
@@ -114,16 +117,21 @@ namespace SBMessenger
                 CurrentUser = ((User)e.AddedItems[0]).UserID;
             }
             UserName.Content = CurrentUser;
+            markMessagesSeen();
+            MessengerInterop.Users[CurrentUser].unreadMesages = 0;
+            ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
+            view.Refresh();
+            MessagesLV.ItemsSource = MessengerInterop.UsersMessages[CurrentUser];
+        }
+
+        private void markMessagesSeen()
+        {
             for (int i = 0; i < MessengerInterop.Users[CurrentUser].unreadMesages; i++)
             {
                 int count = MessengerInterop.UsersMessages[CurrentUser].Count;
                 string ReceivedMessageId = MessengerInterop.UsersMessages[CurrentUser][count - i - 1].MessageId;
                 MessengerInterop.SendMessageSeen(CurrentUser, ReceivedMessageId);
             }
-            MessengerInterop.Users[CurrentUser].unreadMesages = 0;
-            ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.Users.Values);
-            view.Refresh();
-            MessagesLV.ItemsSource = MessengerInterop.UsersMessages[CurrentUser];
         }
 
         private void SendMessageButton_Click(object sender, RoutedEventArgs e)
@@ -139,6 +147,7 @@ namespace SBMessenger
                 SQLiteConnector.AddMessage(MessengerInterop.CurrentMessage, MessengerInterop.UserName);
                 ICollectionView view = CollectionViewSource.GetDefaultView(MessengerInterop.UsersMessages[CurrentUser]);
                 view.Refresh();
+                MessageText.Text = "";
             }
             else
             {
